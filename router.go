@@ -4,6 +4,7 @@ import (
 	"context"
 	accountRpc "github.com/zbwang163/ad_account_overpass"
 	"github.com/zbwang163/ad_account_server/biz/adapter"
+	"log"
 )
 
 type server struct {
@@ -17,8 +18,10 @@ func NewServer() *server {
 	}
 }
 
-func (s *server) Login(ctx context.Context, in *accountRpc.LoginRequest) (*accountRpc.LoginResponse, error) {
-	query := s.AccountAdapter.GetQueryAdapter().LoginRequestAdapter(in)
+func (s *server) Login(ctx context.Context, req *accountRpc.LoginRequest) (*accountRpc.LoginResponse, error) {
+	query := s.AccountAdapter.GetQueryAdapter().LoginRequestAdapter(req)
+	log.Println("login called")
 	dto, bizError := s.AccountAdapter.Login(ctx, query)
+	log.Printf("login dto:%v", dto)
 	return s.AccountAdapter.GetDtoAdapter().LoginDataAdapter(dto, bizError), nil
 }
