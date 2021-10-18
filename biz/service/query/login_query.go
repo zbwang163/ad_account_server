@@ -32,15 +32,15 @@ type UserInfoQuery struct {
 	CtxUserId int64 `validate:"required,gt=0" binding:"-"`
 }
 
-func (q *UserInfoQuery) Bind(ctx context.Context) *UserInfoQuery {
+func (q *UserInfoQuery) Bind(ctx context.Context) {
 	ctxUserId := ctx.Value(consts.CtxUserId).(int64)
-	return &UserInfoQuery{CtxUserId: ctxUserId}
+	q.CtxUserId = ctxUserId
 }
 
 type UpdateUserInfoQuery struct {
-	UserName  string `json:"user_name" binding:"min=1,max=15"` //用户名
-	AvatarUrl string `json:"avatar_url" binding:"url"`
-	Slogan    string `json:"slogan"`
+	UserName  string `json:"user_name" binding:"omitempty,min=1,max=15"` //用户名
+	AvatarUrl string `json:"avatar_url" binding:"omitempty,url"`
+	Slogan    string `json:"slogan" binding:"omitempty,max=100"`
 
 	CtxUserId int64 `validate:"required,gt=0" binding:"-"`
 }
@@ -48,4 +48,45 @@ type UpdateUserInfoQuery struct {
 func (q *UpdateUserInfoQuery) Bind(ctx context.Context) {
 	ctxUserId := ctx.Value(consts.CtxUserId).(int64)
 	q.CtxUserId = ctxUserId
+}
+
+type PolicyQuery struct {
+	PType      string `json:"ptype" binding:"required"`
+	Subject    string `json:"subject" binding:"required"`
+	Domain     string `json:"domain"`
+	Object     string `json:"object"  binding:"required"`
+	Action     string `json:"action"`
+	Effect     string `json:"effect"`
+	Expiration string `json:"expiration"`
+}
+
+type GetRulesByRoleQuery struct {
+	Role       string `json:"role"`
+	CoreUserId string `json:"core_user_id"`
+}
+
+type QuestionQuery struct {
+	Word   string   `json:"word"`
+	Images []string `json:"images"`
+	ToUid  string   `json:"to_uid"`
+
+	CtxUserId int64 `validate:"required,gt=0" binding:"-"`
+}
+
+type PageQuery struct {
+	Page  int64 `json:"page" binding:"min=1,max=100"`
+	Limit int64 `json:"limit" binding:"min=1,max=100"`
+}
+
+type AddAnswerQuery struct {
+	RealPrize          int64  `json:"real_prize"`
+	ProductDescription string `json:"product_description"`
+
+	CtxUserId int64 `validate:"required,gt=0" binding:"-"`
+}
+
+type ConfirmOrderQuery struct {
+	OrderId string `json:"order_id"`
+
+	CtxUserId int64 `validate:"required,gt=0" binding:"-"`
 }

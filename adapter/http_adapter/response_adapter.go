@@ -76,3 +76,19 @@ func UpdateUserInfo(c *gin.Context) (interface{}, error) {
 	}
 	return account.UpdateUserInfo(c, &param)
 }
+
+func AddPolicy(c *gin.Context) (interface{}, error) {
+	param := query.PolicyQuery{}
+	if err := c.ShouldBind(&param); err != nil {
+		return nil, biz_error.NewParamError(err)
+	}
+	return nil, account.AddPolicyRule(c, &param)
+}
+
+func RemovePolicy(c *gin.Context) (interface{}, error) {
+	param := query.PolicyQuery{}
+	if err := c.ShouldBind(&param); err != nil {
+		return nil, biz_error.NewParamError(err)
+	}
+	return nil, account.RemovePolicyRule(c, &param)
+}

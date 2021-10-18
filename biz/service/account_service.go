@@ -17,10 +17,12 @@ import (
 	"github.com/zbwang163/ad_account_server/biz/service/po"
 	"github.com/zbwang163/ad_account_server/biz/service/query"
 	"github.com/zbwang163/ad_account_server/common/biz_error"
+	casbinAdapter "github.com/zbwang163/ad_account_server/common/client/casbin"
 	"github.com/zbwang163/ad_account_server/common/client/minio"
 	"github.com/zbwang163/ad_account_server/common/client/redis"
 	"github.com/zbwang163/ad_account_server/common/client/smtp"
 	"github.com/zbwang163/ad_account_server/common/consts"
+	"github.com/zbwang163/ad_account_server/common/logs"
 	"github.com/zbwang163/ad_account_server/common/utils"
 	"gorm.io/gorm"
 	"image/color"
@@ -59,6 +61,48 @@ type AccountService interface {
 	AsyncSendEmailCapture(ctx context.Context, email string, content string)
 	// GetUserInfoByCoreUserId 获取用户信息
 	GetUserInfoByCoreUserId(ctx context.Context, coreUserId int64) (dto *dto.UserInfoDTO, err error)
+
+	AddPolicyRule(ctx context.Context, ptype string, subject string, domain string, object string, action string, effect string, expiration string) bool
+	RemovePolicyRule(ctx context.Context, ptype string, subject string, domain string, object string, action string, effect string, expiration string) bool
+	GetRulesByRole(ctx context.Context, role string)
+}
+
+func (svc AccountServiceImpl) GetRulesByRole(ctx context.Context, role string) {
+	casbinAdapter.Enforcer.GetGroupingPolicy()
+}
+
+func (svc AccountServiceImpl) AddPolicyRule(ctx context.Context, ptype string, subject string, domain string, object string, action string, effect string, expiration string) bool {
+	var ok bool
+	var err error
+	switch ptype {
+	case "p":
+		ok, err = casbinAdapter.Enforcer.AddPolicy(subject, domain, object, action, effect, expiration)
+	case "g":
+		ok, err = casbinAdapter.Enforcer.AddGroupingPolicy(subject, object, domain)
+	case "g2":
+		ok, err = casbinAdapter.Enforcer.AddNamedGroupingPolicy("g2", subject, object)
+	}
+	if err != nil {
+		logs.CtxError(ctx, "AddPolicyRule err:%v", err)
+	}
+	return ok
+}
+
+func (svc AccountServiceImpl) RemovePolicyRule(ctx context.Context, ptype string, subject string, domain string, object string, action string, effect string, expiration string) bool {
+	var ok bool
+	var err error
+	switch ptype {
+	case "p":
+		ok, err = casbinAdapter.Enforcer.RemovePolicy(subject, domain, object, action, effect, expiration)
+	case "g":
+		ok, err = casbinAdapter.Enforcer.RemoveGroupingPolicy(subject, object, domain)
+	case "g2":
+		ok, err = casbinAdapter.Enforcer.RemoveNamedGroupingPolicy("g2", subject, object)
+	}
+	if err != nil {
+		logs.CtxError(ctx, "RemovePolicyRule err:%v", err)
+	}
+	return ok
 }
 
 func (svc AccountServiceImpl) UpdateUserInfo(ctx context.Context, query *query.UpdateUserInfoQuery) (dto *dto.UserInfoDTO, err error) {
@@ -222,11 +266,11 @@ func (svc AccountServiceImpl) GenCapture(ctx context.Context, len int) (capture 
 
 func (svc AccountServiceImpl) GenCaptureImage(ctx context.Context, len int) (url string, token string, err error) {
 	c := captcha.New()
-	c.SetFont("biz/service/resource/Verdana.ttf")
-	c.SetSize(256, 128)
-	c.SetDisturbance(captcha.MEDIUM) //设置干扰度
-	c.SetFrontColor(color.RGBA{B: 255, A: 255})
-	img, capture := c.Create(len, captcha.NUM)
+	c.SetFont("biz/service/resource/Verdana.ttf") // 字体选择
+	c.SetSize(256, 128)                           // 尺寸
+	c.SetDisturbance(captcha.MEDIUM)              //设置干扰度
+	c.SetFrontColor(color.RGBA{B: 255, A: 255})   // 字体颜色
+	img, capture := c.Create(len, captcha.NUM)    // 纯数字验证码
 	buffer := bytes.NewBuffer([]byte{})
 	err = jpeg.Encode(buffer, img, &jpeg.Options{Quality: 80})
 	if err != nil {

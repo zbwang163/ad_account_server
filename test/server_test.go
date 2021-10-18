@@ -12,6 +12,17 @@ import (
 	"testing"
 )
 
+func main() float64 {
+	var result float64
+	var mergeSlice []int
+	var n = len(mergeSlice)
+	if n%2 == 0 {
+		result = float64(mergeSlice[n/2]+mergeSlice[n/2+1]) / 2.0
+	} else {
+	}
+	return result
+}
+
 func TestName4(t *testing.T) {
 	type Model struct {
 		Uid int64 `json:"uid"`

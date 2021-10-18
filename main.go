@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	casbinAdapter "github.com/zbwang163/ad_account_server/common/client/casbin"
 	"github.com/zbwang163/ad_account_server/common/client/minio"
 	"github.com/zbwang163/ad_account_server/common/client/mysql"
 	"github.com/zbwang163/ad_account_server/common/client/redis"
@@ -29,4 +30,5 @@ func InitClients() {
 	minio.InitMinIO()
 	mysql.InitMysql(consts.AccountPSM)
 	redis.InitRedis(consts.AccountPSM)
+	casbinAdapter.InitCasbin()
 }

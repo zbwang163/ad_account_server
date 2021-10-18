@@ -4,12 +4,15 @@ go 1.16
 
 require (
 	github.com/afocus/captcha v0.0.0-20191010092841-4bd1f21c8868
+	github.com/casbin/casbin/v2 v2.37.2
+	github.com/casbin/gorm-adapter/v3 v3.4.2
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-basic/uuid v1.0.0
 	github.com/go-mailer/send v1.0.1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/minio/minio-go/v7 v7.0.14
 	github.com/sirupsen/logrus v1.8.1

@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-basic/uuid"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/weblazy/snowflake"
 	"github.com/zbwang163/ad_account_server/common/client/redis"
 	"github.com/zbwang163/ad_account_server/common/consts"
@@ -34,15 +36,14 @@ func GetCoreUserIdFromSession(sessionId string) int64 {
 		return 0
 	}
 	str := redis.Redis[consts.AccountPSM].Get(sessionId).Val()
-	var s map[string]interface{}
+	var s struct {
+		CoreUserId int64 `json:"core_user_id"`
+	}
 	err := json.Unmarshal([]byte(str), &s)
 	if err != nil {
 		return 0
 	}
-	if uid, ok := s["core_user_id"]; ok {
-		return uid.(int64)
-	}
-	return 0
+	return s.CoreUserId
 }
 
 // GetLocalIp 获取本机的io
@@ -84,4 +85,8 @@ func GenGlobalUniqueId() (int64, error) {
 		return 0, err
 	}
 	return worker.GetId(), nil
+}
+
+func IfUserHavePrivilege(ctx context.Context, coreUserId int64, url string, method string) bool {
+	return false
 }

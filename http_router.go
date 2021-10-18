@@ -6,7 +6,7 @@ import (
 )
 
 func Register(r *gin.Engine) {
-	g := r.Group("/ad_account_server")
+	g := r.Group("/ad_account_server/api")
 	g.Use(http_adapter.UserInfoMiddleware, http_adapter.LogIdMiddleware, http_adapter.ResponseMiddleware)
 
 	userRouter := g.Group("/user")
@@ -15,5 +15,9 @@ func Register(r *gin.Engine) {
 	userRouter.POST("/register", http_adapter.HandlerFunc(http_adapter.Register))
 	userRouter.POST("/register/email_capture", http_adapter.HandlerFunc(http_adapter.SendEmailCapture))
 	userRouter.POST("/info", http_adapter.HandlerFunc(http_adapter.GetUserInfo))
-	userRouter.POST("/update", http_adapter.HandlerFunc(http_adapter.UpdateUserInfo))
+	userRouter.POST("/update", http_adapter.UserPrivilegeManagement, http_adapter.HandlerFunc(http_adapter.UpdateUserInfo))
+
+	policyRouter := g.Group("/policy")
+	policyRouter.POST("/add", http_adapter.HandlerFunc(http_adapter.AddPolicy))
+	policyRouter.POST("/remove", http_adapter.HandlerFunc(http_adapter.RemovePolicy))
 }

@@ -29,6 +29,55 @@ type AccountController interface {
 	GetCoreUserIdBySession(context.Context, *query.GetCoreUserIdFromSessionQuery) (*dto.UserInfoDTO, error)
 	GetUserInfo(context.Context, *query.UserInfoQuery) (*dto.UserInfoDTO, error)                        //登录
 	UpdateUserInfo(ctx context.Context, infoQuery *query.UpdateUserInfoQuery) (*dto.UserInfoDTO, error) //登录
+
+	AddPolicyRule(ctx context.Context, policyQuery *query.PolicyQuery) error
+	RemovePolicyRule(ctx context.Context, policyQuery *query.PolicyQuery) error
+
+	GetAnswerList(ctx context.Context, pageQuery *query.PageQuery) (*dto.AnswerListDTO, error)
+	AddAnswer(ctx context.Context, answerQuery *query.AddAnswerQuery) error
+	AskQuestion(ctx context.Context, questionQuery *query.QuestionQuery) error
+	ReplyQuestion(ctx context.Context, questionQuery *query.QuestionQuery) error
+	ConfirmOrder(ctx context.Context, query *query.ConfirmOrderQuery) error
+}
+
+func (a AccountControllerImpl) GetAnswerList(ctx context.Context, pageQuery *query.PageQuery) (*dto.AnswerListDTO, error) {
+	panic("implement me")
+}
+
+func (a AccountControllerImpl) AddAnswer(ctx context.Context, answerQuery *query.AddAnswerQuery) error {
+	panic("implement me")
+}
+
+func (a AccountControllerImpl) AskQuestion(ctx context.Context, questionQuery *query.QuestionQuery) error {
+	panic("implement me")
+}
+
+func (a AccountControllerImpl) ReplyQuestion(ctx context.Context, questionQuery *query.QuestionQuery) error {
+	panic("implement me")
+}
+
+func (a AccountControllerImpl) ConfirmOrder(ctx context.Context, query *query.ConfirmOrderQuery) error {
+	panic("implement me")
+}
+
+func (a AccountControllerImpl) RemovePolicyRule(ctx context.Context, policyQuery *query.PolicyQuery) error {
+	err := validator.New().Struct(policyQuery)
+	if err != nil {
+		return biz_error.NewParamError(err)
+	}
+
+	a.AccountService.RemovePolicyRule(ctx, policyQuery.PType, policyQuery.Subject, policyQuery.Domain, policyQuery.Object, policyQuery.Action, policyQuery.Effect, policyQuery.Expiration)
+	return nil
+}
+
+func (a AccountControllerImpl) AddPolicyRule(ctx context.Context, policyQuery *query.PolicyQuery) error {
+	err := validator.New().Struct(policyQuery)
+	if err != nil {
+		return biz_error.NewParamError(err)
+	}
+
+	a.AccountService.AddPolicyRule(ctx, policyQuery.PType, policyQuery.Subject, policyQuery.Domain, policyQuery.Object, policyQuery.Action, policyQuery.Effect, policyQuery.Expiration)
+	return nil
 }
 
 func (a AccountControllerImpl) UpdateUserInfo(ctx context.Context, infoQuery *query.UpdateUserInfoQuery) (*dto.UserInfoDTO, error) {
@@ -42,7 +91,8 @@ func (a AccountControllerImpl) UpdateUserInfo(ctx context.Context, infoQuery *qu
 }
 
 func (a AccountControllerImpl) GetUserInfo(ctx context.Context, infoQuery *query.UserInfoQuery) (*dto.UserInfoDTO, error) {
-	err := validator.New().Struct(infoQuery.Bind(ctx))
+	infoQuery.Bind(ctx)
+	err := validator.New().Struct(infoQuery)
 	if err != nil {
 		return nil, biz_error.NewParamError(err)
 	}
