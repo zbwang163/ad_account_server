@@ -1,6 +1,6 @@
 1. 启动minio
 ```shell
-minio server ~/data
+`2`q
 ```
 2. 启动redis
 ```shell

@@ -13,8 +13,8 @@ import (
 var (
 	Db          = make(map[string]*gorm.DB, 2)
 	mysqlConfig = map[string]string{
-		"ad.info.account_server": "root:7758521.@tcp(localhost:3306)/ad_account?charset=utf8mb4&parseTime=True&loc=Local",
-		"ad.info.content_server": "root:7758521.@tcp(localhost:3306)/ad_content?charset=utf8mb4&parseTime=True&loc=Local",
+		"ad.info.account_server": "root:123456@tcp(localhost:3306)/ad_account?charset=utf8mb4&parseTime=True&loc=Local",
+		"ad.info.content_server": "root:123456@tcp(localhost:3306)/ad_content?charset=utf8mb4&parseTime=True&loc=Local",
 	}
 )
 
